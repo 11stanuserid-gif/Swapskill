@@ -49,7 +49,7 @@ dependencies:
   firebase_analytics: ^11.3.3
 
   # Video Call (Agora)
-  agora_rtc_engine: ^6.3.2
+  agora_rtc_engine: ^6.5.4
   permission_handler: ^11.3.1
 
   # Media
@@ -58,12 +58,12 @@ dependencies:
   camera: ^0.11.0+2
   file_picker: ^8.1.2
 
-  # ⭐ CRITICAL: intl pinned to 0.20.2 (matches flutter_localizations from Flutter 3.27+ SDK)
+  # ⭐ CRITICAL: intl pinned to 0.20.2 (matches flutter_localizations)
   intl: ^0.20.2
 
   # Utilities
   url_launcher: ^6.3.1
-  share_plus: ^10.0.2
+  share_plus: ^10.1.4
   package_info_plus: ^8.0.2
   device_info_plus: ^10.1.2
   connectivity_plus: ^6.0.5

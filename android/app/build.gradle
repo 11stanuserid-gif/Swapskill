@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace "com.swapskil"
+    namespace = "com.swapskil"
     compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
@@ -31,7 +31,6 @@ android {
 
     buildTypes {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
             minifyEnabled false
             shrinkResources false
@@ -44,7 +43,7 @@ flutter {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.24"
     implementation "androidx.multidex:multidex:2.0.1"
     implementation platform("com.google.firebase:firebase-bom:33.5.1")
     implementation "com.google.firebase:firebase-analytics"

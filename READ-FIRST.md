@@ -1,93 +1,69 @@
-# 🎯 GRADLE PLUGIN FIX — Final Build Issue
+# 🎯 FINAL Gradle Version Fix
 
-## 🎉 Good News
-सारी 198 dependencies install हो गईं! intl fix successful!
-अब बस **एक last Gradle error** बाकी है।
-
-## ❌ Current Error
+## ❌ Current Error (बहुत clear है)
 ```
-You are applying Flutter's app_plugin_loader Gradle plugin imperatively
-using the apply script method, which is not possible anymore.
-Migrate to applying Gradle plugins with the plugins block:
-https://flutter.dev/to/flutter-gradle-plugin-apply
+> Error: Your project's Gradle version (8.3.0) is lower than
+  Flutter's minimum supported version of 8.7.0.
+  Please upgrade your Gradle version.
+
+[!] Starting AGP 9+, only the new DSL interface will be read.
 ```
 
-## 🎯 Root Cause
-Flutter 3.27+ ने पुराना `apply from:` syntax **remove कर दिया**।
-Now requires modern **`plugins { }` block** syntax.
+## ✅ Fix — सिर्फ 3 files
 
-## ❓ तुम्हारा Question Answer
-**"Flutter से Android choose करूँ या Direct Android?"**
+| File | क्या बदला |
+|---|---|
+| `android/gradle/wrapper/gradle-wrapper.properties` | Gradle **8.3 → 8.9** ⭐ |
+| `android/settings.gradle` | AGP **8.1 → 8.6**, Kotlin **1.9.10 → 1.9.24** |
+| `android/app/build.gradle` | DSL syntax with `=` (AGP 9 ready) + Kotlin 1.9.24 |
 
-✅ **Always: "Flutter (via Workflow Editor)"** select करो
-❌ **Never: "Android"** (वो Java/Kotlin native projects के लिए है, Flutter के लिए नहीं)
-
-लेकिन तुम्हारे case में **Workflow Editor** की जरूरत नहीं — `codemagic.yaml` file repo में है इसलिए "YAML configuration" automatic use होगा।
-
-## 📝 Files to Replace (7 files)
-
-Sare files `android/` folder के अंदर हैं:
-
-1. **`android/settings.gradle`** ⭐ (नया plugins block syntax)
-2. **`android/build.gradle`** (simplified)
-3. **`android/app/build.gradle`** ⭐ (नया plugins syntax)
-4. **`android/gradle.properties`** (Java 17 compatible)
-5. **`android/gradle/wrapper/gradle-wrapper.properties`** (Gradle 8.3)
-6. **`android/app/src/main/AndroidManifest.xml`** (cleaned up)
-7. **`android/app/src/main/kotlin/com/swapskil/MainActivity.kt`** (verify)
-8. **`codemagic.yaml`** (Flutter 3.27.1 pinned + Java 17)
-
-## ⚠️ MOST IMPORTANT
-पुराने Gradle files को **पूरी तरह replace** करना है, **merge नहीं**।
-सब पुराना content हटाओ, नया paste करो।
-
-## 🚀 Steps
+## 🚀 Steps (3 minutes)
 
 ### GitHub Web (Mobile):
-1. Repo में हर file open करो
-2. ✏️ pencil → सब delete → नया content paste → Commit
 
-### Terminal:
-```bash
-# Replace all files in android/ folder
-cd /your/repo/swapskill_app
+1. **`android/gradle/wrapper/gradle-wrapper.properties`** 
+   - Edit → delete all → paste new (one line different: `gradle-8.9-all.zip`)
+   - Commit
 
-# Copy new files (from this ZIP) over old ones
+2. **`android/settings.gradle`** 
+   - Edit → delete all → paste new
+   - Commit
 
-# Delete lock & clean
-rm -f pubspec.lock
-rm -rf .gradle/ build/ android/.gradle/ android/build/
+3. **`android/app/build.gradle`** 
+   - Edit → delete all → paste new
+   - Commit
 
-git add android/ codemagic.yaml
-git rm pubspec.lock 2>/dev/null || true
-git commit -m "Fix: Migrate to modern Flutter Gradle plugin syntax"
-git push origin main
-```
+4. **Codemagic → Start new build** ✅
 
-## 🎯 Expected Build Logs
+## 🎯 Expected Logs
 
 ```
-✅ Set up Flutter (3.27.1) ........ 30s
-✅ Clean previous builds ........... 5s
-✅ Get Flutter packages ............ 30s
-✅ Flutter analyze ................. 20s
+✅ Preparing build machine
+✅ Fetching app sources
+✅ Installing SDKs (Flutter 3.27.1)
+✅ Set up Flutter
+✅ Clean previous builds
+✅ Get Flutter packages (Got dependencies!)
+✅ Flutter analyze
 ✅ Build APK (release)
-   Running Gradle task 'assembleRelease'...
-   > Task :app:processReleaseGoogleServices
+   > Configure project :app
+   > Task :app:processReleaseGoogleServices ✅
+   > Task :app:compileReleaseKotlin ✅
    > Task :app:assembleRelease ✅
    ✓ Built build/app/outputs/flutter-apk/app-release.apk
-✅ Build AAB (release)
-   ✓ Built build/app/outputs/bundle/release/app-release.aab
+✅ Build AAB (release) 
+   ✓ Built app-release.aab
 🎉 Build successful!
 ```
 
-## 🔑 Key Changes in Gradle Files
+## 🔑 Version Summary (बाद में reference के लिए)
 
-| File | Old Syntax | New Syntax |
+| Component | Version | Note |
 |---|---|---|
-| `settings.gradle` | `apply from:` | `plugins { id "..." }` block |
-| `app/build.gradle` | `apply plugin:` | `plugins { }` at top |
-| Java version | 1.8 | 17 (required by AGP 8) |
-| Gradle | 7.6 | 8.3 |
-| AGP | 7.4 | 8.1 |
-| minSdk | 21 | 23 (Firebase requirement) |
+| Gradle | **8.9** | Flutter 3.27 min = 8.7 |
+| AGP | **8.6** | Stable |
+| Kotlin | **1.9.24** | Latest stable |
+| Java | 17 | Required by AGP 8 |
+| Flutter | 3.27.1 | Pinned in codemagic.yaml |
+| compileSdk | 34 | Latest Android |
+| minSdk | 23 | Firebase auth needs |

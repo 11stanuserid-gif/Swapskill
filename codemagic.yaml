@@ -23,15 +23,25 @@ workflows:
       - name: Flutter analyze (non-blocking)
         script: |
           flutter analyze --no-fatal-infos --no-fatal-warnings || true
-      - name: Build APK (release)
+      - name: Build APK (Debug) - for testing
+        script: |
+          flutter build apk --debug --no-tree-shake-icons
+      - name: Build APK (Release) - for installation
         script: |
           flutter build apk --release --no-tree-shake-icons
-      - name: Build AAB (release)
+      - name: Build AAB (Release) - for Play Store
         script: |
           flutter build appbundle --release --no-tree-shake-icons
+      - name: List build outputs
+        script: |
+          echo "=== APK files ==="
+          find build -name "*.apk" -type f
+          echo "=== AAB files ==="
+          find build -name "*.aab" -type f
     artifacts:
-      - build/**/outputs/**/*.apk
-      - build/**/outputs/**/*.aab
+      - build/app/outputs/flutter-apk/*.apk
+      - build/app/outputs/apk/**/*.apk
+      - build/app/outputs/bundle/**/*.aab
       - build/**/outputs/**/mapping.txt
       - flutter_drive.log
     publishing:
